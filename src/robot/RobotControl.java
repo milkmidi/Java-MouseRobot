@@ -1,27 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package robot;
 
-import java.awt.AWTException;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
-
-
 /**
  *
- * @author user
+ * @author milkmidi
  */
 class RobotControl implements Runnable{
     private final Robot robot; 
@@ -31,7 +16,7 @@ class RobotControl implements Runnable{
     UpdateCallBack updateCallBack;
     ArrayList<ICommand> cmdList;
     int cmdIndex = 0;
-    RobotControl() {           
+    RobotControl() {
         
         try { 
             robot = new Robot();
@@ -115,16 +100,21 @@ class RobotControl implements Runnable{
     class MouseClickCommand implements ICommand{
         int x;
         int y;
-        MouseClickCommand( int x , int y){
+        int buttonMask;
+        MouseClickCommand(int x, int y){
+            this(x,y,InputEvent.BUTTON1_MASK);
+        }
+        MouseClickCommand( int x , int y , int buttonMask){
             this.x = x;
             this.y = y;
-        }
+            this.buttonMask = buttonMask;
+        }        
         @Override
         public void execute(){
             robot.delay(1000);
             robot.mouseMove(x, y);
-            robot.mousePress(InputEvent.BUTTON1_MASK);        
-            robot.mouseRelease(InputEvent.BUTTON1_MASK);        
+            robot.mousePress( buttonMask );   
+            robot.mouseRelease( buttonMask );
         }
     }
     class MouseKeyDownCommand implements ICommand{
