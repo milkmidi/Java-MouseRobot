@@ -7,7 +7,7 @@ import javax.swing.border.EmptyBorder;
  *
  * @author milkmidi
  */
-public class MouseRobot {
+public class MouseRobot implements RobotControl.UpdateCallBack{
     public static void main(String[] args) throws AWTException {        
         MouseRobot entry = new MouseRobot();
     }
@@ -24,12 +24,12 @@ public class MouseRobot {
         log("Entry Constructor");    
         createAndShowGUI();
         control = new RobotControl();      
-//        control.setUpdateCallBack(this);
-//        robot.
+        control.setUpdateCallBack(this);
     }    
     public void update(int count){
         label.setText(count+"");
     }
+ 
     private void startRobot(){
         log("startRobot");
         isStart = true;        
@@ -84,87 +84,5 @@ public class MouseRobot {
         frame.setVisible(true);
     }
     
-    static interface UpdateCallBack{
-        void update(int count);
-    }
     
-    class RobotControl implements Runnable{
-        private final Robot robot; 
-        private Thread clickingThread;
-        boolean running = false;
-        int count = 0;
-        UpdateCallBack updateCallBack;
-        RobotControl() {             
-            try { 
-                robot = new Robot();
-            } 
-            catch (AWTException e){ 
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }        
-            
-        } 
-        public void setUpdateCallBack(UpdateCallBack updateCallBack){
-            this.updateCallBack = updateCallBack;
-        }
-        void startControl()  {
-            stopControl(); 
-            log("startControl");
-            running = true;
-            startClicking(); 
-        }    
-        private void startClicking()    { 
-            clickingThread = new Thread( ()-> {performClicks();});
-            clickingThread.start();
-        }       
-     
-        void stopControl()  {
-            if (running) {
-                System.out.println("Stopping");
-                running = false;
-                try { 
-                    clickingThread.join(5000);
-//                    observingThread.join(5000);
-                } 
-                catch (InterruptedException e)            { 
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                } 
-            } 
-        } 
-        private void performClicks(){
-            while( running ){
-                robot.delay(3000);
-                robot.mouseMove(200, 200);        
-                leftClick();
-                keyDown(); 
-                count++;
-                try  { 
-                    Thread.sleep(5000);
-                    log("count:" + count);
-                    SwingUtilities.invokeLater(this);                    
-                } 
-                catch (InterruptedException e) { 
-                    e.printStackTrace();
-                    Thread.currentThread().interrupt();
-                    return; 
-                } 
-            }
-        }
-        @Override
-        public void run(){
-            
-        }
-        private void keyDown(){
-            robot.delay(200);
-            robot.keyPress(KeyEvent.VK_A);
-        }
-        private void leftClick()  {
-            //log("leftClick");
-            robot.delay(200);
-            robot.mousePress(InputEvent.BUTTON1_MASK);        
-            robot.mouseRelease(InputEvent.BUTTON1_MASK);        
-    //        robot.delay(200);
-        }
-    }
 }
